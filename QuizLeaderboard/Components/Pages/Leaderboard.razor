@@ -1,0 +1,130 @@
+﻿@page "/leaderboard"
+@rendermode InteractiveServer
+@using QuizLeaderboard.Services
+@using QuizLeaderboard.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@inject LeaderboardService LeaderboardService
+@inject UserSession Session
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+
+<h3>Leaderboard</h3>
+
+@if (!Session.IsLoggedIn)
+{
+    <p><a href="/login">Log in</a> to start playing and appear on the leaderboard.</p>
+}
+else
+{
+    <p>Logged in as <strong>@Session.CurrentUser!.DisplayName</strong>.</p>
+}
+
+<select @bind="selectedPeriod" @bind:after="LoadLeaderboard">
+    <option value="Daily">Daily</option>
+    <option value="Weekly">Weekly</option>
+    <option value="Monthly">Monthly</option>
+</select>
+
+@if (entries == null)
+{
+    <p>Loading...</p>
+}
+else if (!entries.Any())
+{
+    <p>No results yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Score</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var e in entries)
+        {
+            <tr>
+                <td>@e.Rank</td>
+                <td>@e.DisplayName</td>
+                <td>@e.TotalScore</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<hr />
+
+<h4>Add score (demo)</h4>
+
+@if (!Session.IsLoggedIn)
+{
+    <p>You must <a href="/login">log in</a> before submitting a score.</p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Score:</label>
+        <input type="number" @bind="newScore" class="form-control" />
+    </div>
+    <button class="btn btn-primary" @onclick="SubmitScore">Send score</button>
+}
+
+@code {
+    private LeaderboardPeriod selectedPeriod = LeaderboardPeriod.Daily;
+    private List<LeaderboardEntry>? entries;
+
+    private int newScore;
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // SignalR kapcsolat a Hubhoz
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/hubs/leaderboard"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        // amikor a Hub küld egy friss toplistát
+        hubConnection.On<List<LeaderboardEntry>>("LeaderboardUpdated", data =>
+        {
+            entries = data;
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+
+        // első betöltés szerverről
+        await LoadLeaderboard();
+    }
+
+    private async Task LoadLeaderboard()
+    {
+        entries = await LeaderboardService.GetLeaderboardAsync(selectedPeriod);
+    }
+
+    private async Task SubmitScore()
+    {
+        if (!Session.IsLoggedIn || hubConnection is null)
+            return;
+
+        var userName = Session.CurrentUser!.DisplayName;
+
+        // a pont már NEM közvetlenül a DbContexten megy,
+        // hanem a SignalR Hub SubmitScore metódusán
+        await hubConnection.SendAsync("SubmitScore", userName, newScore, selectedPeriod);
+
+        newScore = 0;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

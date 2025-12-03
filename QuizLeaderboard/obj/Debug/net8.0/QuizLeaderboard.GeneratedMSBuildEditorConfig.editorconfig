@@ -22,6 +22,10 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/QuizLeaderboard/Components/Pages/CasualQuiz.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDYXN1YWxRdWl6LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/QuizLeaderboard/Components/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -32,6 +36,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/QuizLeaderboard/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/QuizLeaderboard/Components/Pages/Leaderboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMZWFkZXJib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/QuizLeaderboard/Components/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/QuizLeaderboard/Components/Pages/Weather.razor]

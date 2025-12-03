@@ -1,0 +1,136 @@
+﻿@page "/casual"
+@rendermode InteractiveServer
+@using QuizLeaderboard.Models
+@using QuizLeaderboard.Services
+@inject IQuestionGenerator QuestionGenerator
+@inject QuizLeaderboard.Data.AppDbContext Db
+@inject UserSession Session
+
+<h3>Casual quiz</h3>
+
+@if (!Session.IsLoggedIn)
+{
+    <p><a href="/login">Log in</a> to play and earn points.</p>
+}
+else
+{
+    <p>Playing as <strong>@Session.CurrentUser!.DisplayName</strong></p>
+
+    <div class="mb-3">
+        <label>Topic:</label>
+        <select class="form-select" @bind="selectedTopic">
+            <option value="C# basics">C# basics</option>
+            <option value="Web fundamentals">Web fundamentals</option>
+            <option value="Databases">Databases</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Difficulty:</label>
+        <select class="form-select" @bind="selectedDifficulty">
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+        </select>
+    </div>
+
+    @if (currentQuestion is null)
+    {
+        <button class="btn btn-primary" @onclick="StartNewQuestion">Start question</button>
+    }
+    else
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <p><strong>@currentQuestion.Text</strong></p>
+
+                <div class="list-group">
+                    @for (int i = 0; i < currentQuestion.Options.Length; i++)
+                    {
+                        int index = i;   // ← IMPORTANT: local copy fixes closure capture
+
+                        <button class="list-group-item list-group-item-action"
+                                disabled="@answered"
+                                @onclick="() => Answer(index)">
+                            @currentQuestion.Options[i]
+                        </button>
+                    }
+
+                </div>
+
+                @if (answered)
+                {
+                    <p class="mt-3">
+                        @if (lastCorrect)
+                        {
+                            <span class="text-success">Correct! +1 point (Casual)</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">Wrong answer.</span>
+                        }
+                    </p>
+
+                    <button class="btn btn-secondary mt-2" @onclick="StartNewQuestion">Next question</button>
+                }
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private Question? currentQuestion;
+    private bool answered;
+    private bool lastCorrect;
+
+    private string selectedTopic = "C# basics";
+    private string selectedDifficulty = "Medium";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Nem indítunk automatikusan kérdést –
+        // a user be tudja állítani a topic + difficulty-t előtte.
+    }
+
+    private async Task StartNewQuestion()
+    {
+        answered = false;
+        lastCorrect = false;
+
+        var req = new QuestionRequest(
+            Topic: selectedTopic,
+            Difficulty: selectedDifficulty,
+            Count: 1,
+            Mode: QuestionSourceMode.Casual
+        );
+
+        var questions = await QuestionGenerator.GenerateQuestionsAsync(req);
+        currentQuestion = questions.FirstOrDefault();
+    }
+
+    private async Task Answer(int index)
+    {
+        if (currentQuestion is null || !Session.IsLoggedIn)
+            return;
+
+        answered = true;
+        lastCorrect = index == currentQuestion.CorrectIndex;
+
+        if (lastCorrect)
+        {
+            var userId = Session.CurrentUser!.Id;
+
+            Db.QuizResults.Add(new QuizResult
+            {
+                UserId = userId,
+                Score = 1, // Casual: 1 pont / helyes válasz
+                CompletedAt = DateTime.UtcNow,
+                Mode = QuizMode.Casual,
+                Topic = currentQuestion.Topic,
+                Difficulty = currentQuestion.Difficulty
+            });
+
+            await Db.SaveChangesAsync();
+        }
+    }
+}

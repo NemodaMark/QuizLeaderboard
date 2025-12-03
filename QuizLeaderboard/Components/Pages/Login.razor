@@ -1,0 +1,43 @@
+﻿@page "/login"
+@rendermode InteractiveServer
+@using QuizLeaderboard.Services
+@inject AuthService Auth
+@inject UserSession Session
+@inject NavigationManager Nav
+
+<h3>Login</h3>
+
+@if (Session.IsLoggedIn)
+{
+    <p>You are logged in as <strong>@Session.CurrentUser!.DisplayName</strong>.</p>
+    <button class="btn btn-secondary" @onclick="Logout">Log out</button>
+}
+else
+{
+    <div class="mb-3">
+        <label>Nickname</label>
+        <input class="form-control" @bind="name" />
+        <div class="form-text">This name will appear on the leaderboard.</div>
+    </div>
+    <button class="btn btn-primary" @onclick="HandleLogin">Continue</button>
+}
+
+@code {
+    private string name = "";
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
+        await Auth.LoginOrRegisterAsync(name);
+        Nav.NavigateTo("/leaderboard");
+    }
+
+    private Task Logout()
+    {
+        Session.SetUser(null);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}
