@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Fu9RZrEA2w+cxCTgIbRU7rZiHSFPYMQV59sXvl8cYdM=",
+  "Hash": "Lav3H/xTymxnBkyd2UGMl+ie587hpw97UFP1a3nIa4U=",
   "Source": "QuizLeaderboard",
   "BasePath": "_content/QuizLeaderboard",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "QuizLeaderboard\\wwwroot",
       "Source": "QuizLeaderboard",
-      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\",
       "BasePath": "_content/QuizLeaderboard",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\bundle\\QuizLeaderboard.styles.css",
+      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\bundle\\QuizLeaderboard.styles.css",
       "SourceId": "QuizLeaderboard",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
+      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
       "BasePath": "_content/QuizLeaderboard",
       "RelativePath": "QuizLeaderboard.styles.css",
       "AssetKind": "All",
@@ -33,13 +33,13 @@
       "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\bundle\\QuizLeaderboard.styles.css"
+      "OriginalItemSpec": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\bundle\\QuizLeaderboard.styles.css"
     },
     {
-      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\QuizLeaderboard.bundle.scp.css",
+      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\QuizLeaderboard.bundle.scp.css",
       "SourceId": "QuizLeaderboard",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
+      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
       "BasePath": "_content/QuizLeaderboard",
       "RelativePath": "QuizLeaderboard.bundle.scp.css",
       "AssetKind": "All",
@@ -52,13 +52,13 @@
       "AssetTraitValue": "ProjectBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\QuizLeaderboard.bundle.scp.css"
+      "OriginalItemSpec": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\QuizLeaderboard.bundle.scp.css"
     },
     {
-      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\app.css",
+      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\app.css",
       "SourceId": "QuizLeaderboard",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\",
       "BasePath": "_content/QuizLeaderboard",
       "RelativePath": "app.css",
       "AssetKind": "All",
@@ -74,10 +74,10 @@
       "OriginalItemSpec": "wwwroot\\app.css"
     },
     {
-      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\bootstrap\\bootstrap.min.css",
       "SourceId": "QuizLeaderboard",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\",
       "BasePath": "_content/QuizLeaderboard",
       "RelativePath": "bootstrap/bootstrap.min.css",
       "AssetKind": "All",
@@ -93,10 +93,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "SourceId": "QuizLeaderboard",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\",
       "BasePath": "_content/QuizLeaderboard",
       "RelativePath": "bootstrap/bootstrap.min.css.map",
       "AssetKind": "All",
@@ -112,10 +112,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\favicon.png",
+      "Identity": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\favicon.png",
       "SourceId": "QuizLeaderboard",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\QuizLeaderboard\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\",
       "BasePath": "_content/QuizLeaderboard",
       "RelativePath": "favicon.png",
       "AssetKind": "All",

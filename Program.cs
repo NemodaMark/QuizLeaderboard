@@ -1,4 +1,3 @@
-
 using QuizLeaderboard.Components;
 using Microsoft.EntityFrameworkCore;
 using QuizLeaderboard.Data;
@@ -18,14 +17,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddSignalR();
 
+// Saját „session” és auth logika (NINCS cookie-auth!)
 builder.Services.AddScoped<UserSession>();
 builder.Services.AddScoped<AuthService>();
 
+// AI kérdésgenerátor HTTP kliens
 builder.Services.AddHttpClient<IQuestionGenerator, OpenAIQuestionGenerator>(client =>
 {
     client.BaseAddress = new Uri("https://api.groq.com/");
 });
-
 
 var app = builder.Build();
 
@@ -33,28 +33,30 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// NINCS: app.UseAuthentication();
+// NINCS: app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
 
+// Adatbázis seed
+// Adatbázis seed
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    // csak egyszer fut le, ha még nincs adat
+    // ⬅️ EZ AZ ÚJ SOR
+    db.Database.EnsureCreated();
+
     if (!db.Users.Any())
     {
         var u1 = new User { DisplayName = "Alice" };
@@ -80,6 +82,5 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 }
-
 
 app.Run();
