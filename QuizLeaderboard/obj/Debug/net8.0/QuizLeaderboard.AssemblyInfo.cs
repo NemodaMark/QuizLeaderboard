@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QuizLeaderboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f80ffd666da4a8fb36f4839a03fa727fc0decea7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2a7ce251eeff9d5f5d0fb14f943eddd33aca177f")]
 [assembly: System.Reflection.AssemblyProductAttribute("QuizLeaderboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QuizLeaderboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

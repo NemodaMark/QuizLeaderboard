@@ -32,4 +32,15 @@ public class AuthService
         _session.SetUser(user);
         return user;
     }
+
+    public Task LogoutAsync()
+    {
+        _session.SetUser(null);
+        return Task.CompletedTask;
+    }
+
+    public Task<User?> GetCurrentUserAsync()
+    {
+        return Task.FromResult(_session.CurrentUser);
+    }
 }

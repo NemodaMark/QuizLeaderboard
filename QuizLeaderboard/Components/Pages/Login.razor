@@ -1,43 +1,73 @@
 ﻿@page "/login"
 @rendermode InteractiveServer
+@using QuizLeaderboard.Models
 @using QuizLeaderboard.Services
 @inject AuthService Auth
 @inject UserSession Session
-@inject NavigationManager Nav
 
 <h3>Login</h3>
 
-@if (Session.IsLoggedIn)
+@if (_currentUser is null)
 {
-    <p>You are logged in as <strong>@Session.CurrentUser!.DisplayName</strong>.</p>
-    <button class="btn btn-secondary" @onclick="Logout">Log out</button>
+    <p>Enter a name to log in.</p>
+
+    <input class="form-control"
+           @bind="_name"
+           placeholder="Your name" />
+
+    @if (!string.IsNullOrWhiteSpace(_error))
+    {
+        <p class="text-danger mt-1">@_error</p>
+    }
+
+    <button class="btn btn-primary mt-2" @onclick="HandleLogin">
+        Log in
+    </button>
 }
 else
 {
-    <div class="mb-3">
-        <label>Nickname</label>
-        <input class="form-control" @bind="name" />
-        <div class="form-text">This name will appear on the leaderboard.</div>
-    </div>
-    <button class="btn btn-primary" @onclick="HandleLogin">Continue</button>
+    <p>You are logged in as <strong>@_currentUser.DisplayName</strong>.</p>
+    <button class="btn btn-secondary" @onclick="HandleLogout">
+        Log out
+    </button>
 }
 
 @code {
-    private string name = "";
+    private string? _name;
+    private string _error = "";
+    private User? _currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentUser = await Auth.GetCurrentUserAsync();
+
+        if (_currentUser is not null)
+        {
+            // hogy a Daily/Casual is lássa
+            Session.SetUser(_currentUser);
+        }
+    }
 
     private async Task HandleLogin()
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return;
+        _error = "";
 
-        await Auth.LoginOrRegisterAsync(name);
-        Nav.NavigateTo("/leaderboard");
+        if (string.IsNullOrWhiteSpace(_name))
+        {
+            _error = "Name is required.";
+            return;
+        }
+
+        var user = await Auth.LoginOrRegisterAsync(_name);
+        _currentUser = user;
+
+        Session.SetUser(user);
     }
 
-    private Task Logout()
+    private async Task HandleLogout()
     {
+        await Auth.LogoutAsync();
+        _currentUser = null;
         Session.SetUser(null);
-        StateHasChanged();
-        return Task.CompletedTask;
     }
 }

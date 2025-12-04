@@ -28,19 +28,22 @@ public class OpenAIQuestionGenerator : IQuestionGenerator
     {
         // Strong JSON-only system instruction
         var systemPrompt = """
-You are a quiz question generator.
-Return ONLY valid JSON array like this:
+              You are a quiz question generator.
+              Return ONLY a valid JSON array like:
 
-[
-  {
-    "text": "question text",
-    "options": ["A","B","C","D"],
-    "correctIndex": 0
-  }
-]
+              [
+                {
+                  "text": "question text in Hungarian",
+                  "options": ["A", "B", "C", "D"],
+                  "correctIndex": 0
+                }
+              ]
 
-Do NOT add explanations, commentary, formatting, markdown, or additional text.
-""";
+              - Always 4 options
+              - Exactly one correctIndex (0-3)
+              - No explanation, no markdown, no extra text.
+              """;
+
 
         var userPrompt =
             $"Generate {request.Count} {request.Difficulty} difficulty " +
