@@ -1,0 +1,202 @@
+﻿@page "/learning"
+@rendermode InteractiveServer
+@using QuizLeaderboard.Models
+@using QuizLeaderboard.Services
+@using QuizLeaderboard.Data
+@inject IQuestionGenerator QuestionGenerator
+@inject UserSession Session
+@inject AppDbContext Db
+@inject AuthService Auth
+
+
+<h3>Learning mode</h3>
+
+@if (!Session.IsLoggedIn)
+{
+    <p>Please login first to use Learning mode.</p>
+    <NavLink class="btn btn-primary" href="/login">Go to Login</NavLink>
+}
+else if (isFinished)
+{
+    <h4>Session finished ✅</h4>
+    <p>You answered @correctCount / @TotalQuestions questions correctly.</p>
+    <p>Total points earned: <strong>@totalScore</strong></p>
+
+    <button class="btn btn-primary mt-3" @onclick="Restart">
+        Start new learning session
+    </button>
+}
+else if (currentQuestion is null)
+{
+    <p>Loading question...</p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Topic:</label>
+        <select class="form-select" @bind="selectedTopic" disabled="@hasStarted">
+            @foreach (var t in Topics)
+            {
+                <option value="@t">@t</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Difficulty:</label>
+        <select class="form-select" @bind="selectedDifficulty" disabled="@hasStarted">
+            @foreach (var d in Difficulties)
+            {
+                <option value="@d">@d</option>
+            }
+        </select>
+    </div>
+
+    <hr/>
+
+    <h4>Question @currentIndex / @TotalQuestions</h4>
+
+    <p>@currentQuestion.Text</p>
+
+    @for (int i = 0; i < currentQuestion.Options.Length; i++)
+    {
+        <button class="btn btn-outline-primary my-2 w-100 text-start"
+                disabled="@answered"
+                @onclick="(() => Answer(i))">
+            @currentQuestion.Options[i]
+        </button>
+    }
+
+    @if (answered)
+    {
+        <p class="@resultClass">@resultMessage</p>
+
+        @if (currentIndex < TotalQuestions)
+        {
+            <button class="btn btn-secondary mt-2" @onclick="NextQuestion">Next</button>
+        }
+        else
+        {
+            <button class="btn btn-success mt-2" @onclick="FinishSession">Finish learning session</button>
+        }
+    }
+}
+
+@code {
+    private const int TotalQuestions = 8;
+
+    private readonly List<string> Topics = new()
+    {
+        "C# basics",
+        "ASP.NET",
+        "Databases"
+    };
+
+    private readonly string[] Difficulties = { "Easy", "Medium", "Hard" };
+
+    private string selectedTopic = "C# basics";
+    private string selectedDifficulty = "Medium";
+
+    private int currentIndex = 1;
+    private Question? currentQuestion;
+    private bool answered = false;
+    private string resultMessage = "";
+    private string resultClass = "";
+    private int correctCount = 0;
+    private int totalScore = 0;
+    private bool isFinished = false;
+    private bool hasStarted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1) user visszatöltése cookie-ból, ha kell
+        var user = await Auth.GetCurrentUserAsync();
+        if (user is null)
+        {
+            // nincs bejelentkezve → markup elején a !Session.IsLoggedIn ág fog életbe lépni
+            return;
+        }
+
+        // 2) biztos, ami biztos: Sessionben is legyen
+        Session.SetUser(user);
+
+        // 3) indulhat az első kérdés
+        await LoadNewQuestion();
+    }
+
+
+    private async Task LoadNewQuestion()
+    {
+        hasStarted = true;
+
+        var req = new QuestionRequest(
+            Topic: selectedTopic,
+            Difficulty: selectedDifficulty,
+            Count: 1,
+            Mode: QuestionSourceMode.Learning
+        );
+
+        var list = await QuestionGenerator.GenerateQuestionsAsync(req);
+
+        currentQuestion = list.First();
+        answered = false;
+        resultMessage = "";
+        resultClass = "";
+    }
+
+    private void Answer(int index)
+    {
+        if (currentQuestion is null) return;
+
+        answered = true;
+
+        if (index == currentQuestion.CorrectIndex)
+        {
+            correctCount++;
+            totalScore += 2; // Learning: 2 pont / jó válasz
+            resultMessage = "Correct! 🎉";
+            resultClass = "text-success";
+        }
+        else
+        {
+            resultMessage = $"Wrong ❌ (correct: {currentQuestion.Options[currentQuestion.CorrectIndex]})";
+            resultClass = "text-danger";
+        }
+    }
+
+    private async Task NextQuestion()
+    {
+        currentIndex++;
+        await LoadNewQuestion();
+    }
+
+    private async Task FinishSession()
+    {
+        var user = Session.CurrentUser!;
+        isFinished = true;
+
+        Db.QuizResults.Add(new QuizResult
+        {
+            UserId = user.Id,
+            Score = totalScore,
+            CompletedAt = DateTime.UtcNow,
+            Mode = QuizMode.Learning,
+            Topic = selectedTopic,
+            Difficulty = selectedDifficulty
+        });
+
+        await Db.SaveChangesAsync();
+    }
+
+    private async Task Restart()
+    {
+        // reset state
+        currentIndex = 1;
+        correctCount = 0;
+        totalScore = 0;
+        isFinished = false;
+        hasStarted = false;
+
+        await LoadNewQuestion();
+    }
+}

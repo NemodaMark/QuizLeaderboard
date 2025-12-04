@@ -1,0 +1,49 @@
+﻿@page "/login"
+@rendermode InteractiveServer
+@using QuizLeaderboard.Models
+@using QuizLeaderboard.Services
+@inject AuthService Auth
+@inject UserSession Session
+
+<h3>Login</h3>
+
+@if (_currentUser is null)
+{
+    <p>Enter a name to log in.</p>
+    <input class="form-control" @bind="_name" placeholder="Your name" />
+    <button class="btn btn-primary mt-2" @onclick="HandleLogin">Log in</button>
+}
+else
+{
+    <p>You are logged in as <strong>@_currentUser.DisplayName</strong>.</p>
+    <button class="btn btn-secondary" @onclick="HandleLogout">Log out</button>
+}
+
+@code {
+    private string? _name;
+    private User? _currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentUser = await Auth.GetCurrentUserAsync();
+
+        if (_currentUser is not null)
+        {
+            Session.SetUser(_currentUser);
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        var user = await Auth.LoginOrRegisterAsync(_name ?? "");
+        _currentUser = user;
+        Session.SetUser(user);
+    }
+
+    private async Task HandleLogout()
+    {
+        await Auth.LogoutAsync();
+        _currentUser = null;
+        Session.SetUser(null);
+    }
+}
