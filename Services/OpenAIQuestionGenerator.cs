@@ -12,7 +12,6 @@ public class OpenAIQuestionGenerator : IQuestionGenerator
     private readonly string _apiKey;
     private readonly string _model;
 
-    // Groq Chat Completions endpoint (MUST be absolute URL)
     private const string ChatUrl = "https://api.groq.com/openai/v1/chat/completions";
 
     public OpenAIQuestionGenerator(HttpClient http, IConfiguration config)
@@ -20,30 +19,37 @@ public class OpenAIQuestionGenerator : IQuestionGenerator
         _http = http;
 
         var section = config.GetSection("Groq");
-        _apiKey = section["ApiKey"] ?? throw new InvalidOperationException("Groq:ApiKey is missing");
-        _model = section["Model"] ?? "llama3-8b-8192";
+        _apiKey = section["ApiKey"] ?? "";
+        _model  = section["Model"]  ?? "llama3-8b-8192";
+
+        Console.WriteLine($"[Groq] Loaded ApiKey length = {_apiKey?.Length ?? 0}, model = {_model}");
     }
 
     public async Task<List<Question>> GenerateQuestionsAsync(QuestionRequest request)
     {
-        // Strong JSON-only system instruction
+        // 1) nincs kulcs → mindig local
+        if (string.IsNullOrWhiteSpace(_apiKey))
+        {
+            Console.WriteLine("[Groq] No API key -> local questions");
+            return GenerateFallbackQuestions(request, "noApi");
+        }
+
         var systemPrompt = """
-              You are a quiz question generator.
-              Return ONLY a valid JSON array like:
+            You are a quiz question generator.
+            Return ONLY a valid JSON array like:
 
-              [
-                {
-                  "text": "question text in Hungarian",
-                  "options": ["A", "B", "C", "D"],
-                  "correctIndex": 0
-                }
-              ]
+            [
+              {
+                "text": "question text in Hungarian",
+                "options": ["A", "B", "C", "D"],
+                "correctIndex": 0
+              }
+            ]
 
-              - Always 4 options
-              - Exactly one correctIndex (0-3)
-              - No explanation, no markdown, no extra text.
-              """;
-
+            - Always 4 options.
+            - Exactly one correctIndex (0-3).
+            - No explanation, no markdown, no code fences, no extra text.
+            """;
 
         var userPrompt =
             $"Generate {request.Count} {request.Difficulty} difficulty " +
@@ -52,16 +58,16 @@ public class OpenAIQuestionGenerator : IQuestionGenerator
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, ChatUrl);
 
-        httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        httpRequest.Headers.Authorization =
+            new AuthenticationHeaderValue("Bearer", _apiKey);
 
-        // GROQ DOES NOT SUPPORT response_format
         var payload = new
         {
             model = _model,
             messages = new[]
             {
                 new { role = "system", content = systemPrompt },
-                new { role = "user", content = userPrompt }
+                new { role = "user",   content = userPrompt   }
             }
         };
 
@@ -71,80 +77,191 @@ public class OpenAIQuestionGenerator : IQuestionGenerator
             "application/json"
         );
 
-        using var response = await _http.SendAsync(httpRequest);
+        HttpResponseMessage response;
+        try
+        {
+            response = await _http.SendAsync(httpRequest);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("[Groq] Network error: " + ex.Message);
+            return GenerateFallbackQuestions(request, "network");
+        }
 
-        // Rate limit handling
         if (response.StatusCode == HttpStatusCode.TooManyRequests)
         {
+            Console.WriteLine("[Groq] 429 TooManyRequests, retrying once...");
             await Task.Delay(1000);
-            using var retryResponse = await _http.SendAsync(httpRequest);
 
-            if (retryResponse.StatusCode == HttpStatusCode.TooManyRequests)
-                return GenerateFallbackQuestions(request);
-
-            return await ParseResponse(retryResponse, request);
+            try
+            {
+                response = await _http.SendAsync(httpRequest);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[Groq] Network error (retry): " + ex.Message);
+                return GenerateFallbackQuestions(request, "network2");
+            }
         }
 
-        // 400 or other errors → fallback
-        if (response.StatusCode == HttpStatusCode.BadRequest)
+        if (!response.IsSuccessStatusCode)
         {
-            return GenerateFallbackQuestions(request);
+            Console.WriteLine("[Groq] Bad HTTP status: " + 
+                              (int)response.StatusCode + " " + response.StatusCode);
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("[Groq] Response body: " + error);
+
+            return GenerateFallbackQuestions(request, "badStatus"); 
         }
 
-        response.EnsureSuccessStatusCode();
+
         return await ParseResponse(response, request);
     }
 
-    private static async Task<List<Question>> ParseResponse(HttpResponseMessage response, QuestionRequest request)
+    private static async Task<List<Question>> ParseResponse(
+        HttpResponseMessage response,
+        QuestionRequest request)
     {
         var raw = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("[Groq] Raw response (first 400 chars):");
+        Console.WriteLine(raw.Substring(0, Math.Min(400, raw.Length)));
 
-        using var doc = JsonDocument.Parse(raw);
+        // --- 1) parse outer Groq JSON ---
+        JsonDocument doc;
+        try
+        {
+            doc = JsonDocument.Parse(raw);
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine("[Groq] Failed to parse outer JSON: " + ex.Message);
+            return GenerateFallbackQuestions(request, "parseOuter");
+        }
+        using var _ = doc;
 
-        // Extract AI JSON string
-        var content = doc.RootElement
-            .GetProperty("choices")[0]
-            .GetProperty("message")
-            .GetProperty("content")
-            .GetString();
+        string? content;
+        try
+        {
+            content = doc.RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("[Groq] Failed to read choices[0].message.content: " + ex.Message);
+            return GenerateFallbackQuestions(request, "noContent");
+        }
 
         if (string.IsNullOrWhiteSpace(content))
-            throw new Exception("Empty response from Groq.");
+        {
+            Console.WriteLine("[Groq] Content is empty");
+            return GenerateFallbackQuestions(request, "emptyContent");
+        }
 
-        // Parse JSON array inside content
-        using var questionsDoc = JsonDocument.Parse(content);
-        var arr = questionsDoc.RootElement;
+        content = content.Trim();
+
+        // --- 2) strip ``` fences if present ---
+        if (content.StartsWith("```"))
+        {
+            var firstNewline = content.IndexOf('\n');
+            var lastFence = content.LastIndexOf("```", StringComparison.Ordinal);
+
+            if (firstNewline >= 0 && lastFence > firstNewline)
+            {
+                content = content.Substring(
+                    firstNewline + 1,
+                    lastFence - firstNewline - 1
+                ).Trim();
+            }
+        }
+
+        // repair the most frequent invalid escapes: \'  -> '
+        content = content.Replace("\\'", "'");
+
+        // --- 3) isolate JSON array between first '[' and last ']' ---
+        var start = content.IndexOf('[');
+        var end   = content.LastIndexOf(']');
+
+        if (start >= 0 && end > start)
+        {
+            content = content.Substring(start, end - start + 1);
+        }
+
+        Console.WriteLine("[Groq] Inner content (first 400 chars):");
+        Console.WriteLine(content.Substring(0, Math.Min(400, content.Length)));
+
+        // --- 4) parse inner JSON array ---
+        JsonDocument questionsDoc;
+        try
+        {
+            questionsDoc = JsonDocument.Parse(content);
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine("[Groq] Failed to parse inner JSON: " + ex.Message);
+            return GenerateFallbackQuestions(request, "parseInner");
+        }
+        using var __ = questionsDoc;
+
+        var root = questionsDoc.RootElement;
+        if (root.ValueKind != JsonValueKind.Array)
+        {
+            Console.WriteLine("[Groq] Inner JSON is not an array");
+            return GenerateFallbackQuestions(request, "notArray");
+        }
 
         var list = new List<Question>();
 
-        foreach (var q in arr.EnumerateArray())
+        foreach (var q in root.EnumerateArray())
         {
-            list.Add(new Question
+            try
             {
-                Topic = request.Topic,
-                Difficulty = request.Difficulty,
-                Text = q.GetProperty("text").GetString() ?? "",
-                Options = q.GetProperty("options")
+                var options = q.GetProperty("options")
                     .EnumerateArray()
                     .Select(x => x.GetString() ?? "")
-                    .ToArray(),
-                CorrectIndex = q.GetProperty("correctIndex").GetInt32()
-            });
+                    .ToArray();
+
+                if (options.Length != 4)
+                    continue;
+
+                list.Add(new Question
+                {
+                    Topic        = request.Topic,
+                    Difficulty   = request.Difficulty,
+                    Text         = q.GetProperty("text").GetString() ?? "",
+                    Options      = options,
+                    CorrectIndex = q.GetProperty("correctIndex").GetInt32()
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[Groq] Skipping malformed question: " + ex.Message);
+            }
+        }
+
+        if (list.Count == 0)
+        {
+            Console.WriteLine("[Groq] No valid questions parsed");
+            return GenerateFallbackQuestions(request, "noValid");
         }
 
         return list;
     }
 
-    // Offline fallback
-    private List<Question> GenerateFallbackQuestions(QuestionRequest request)
+    private static List<Question> GenerateFallbackQuestions(QuestionRequest request, string reason)
     {
+        // reason-t ráírjuk, hogy lásd, hol akad el
+        var label = $"[LOCAL:{reason}]";
+
         return new List<Question>
         {
             new Question
             {
                 Topic = request.Topic,
                 Difficulty = request.Difficulty,
-                Text = $"[LOCAL] Mivel foglalkozik a(z) {request.Topic} témakör?",
+                Text = $"{label} Mivel foglalkozik a(z) {request.Topic} témakör?",
                 Options = new[]
                 {
                     "Programkód írásával és karbantartásával",

@@ -1,10 +1,15 @@
 ﻿@page "/profile"
+@page "/profile/{UserId:int}"
 @rendermode InteractiveServer 
+
 @using QuizLeaderboard.Models
 @using QuizLeaderboard.Services
 @using QuizLeaderboard.Data
+
 @inject AppDbContext Db
 @inject UserSession Session
+@inject DuelService DuelService
+@inject NavigationManager Nav
 
 <h3>Your profile</h3>
 
@@ -14,7 +19,7 @@
 }
 else
 {
-    <!-- BANNER FELÜL -->
+    <!-- Banner -->
     <div class="mb-3">
         <img src="@GetBannerToShow()" alt="Banner"
              style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;">
@@ -22,50 +27,90 @@ else
 
     <h4>@_user.DisplayName</h4>
 
-    <!-- Avatar maradhat, ha használod -->
+    <!-- Avatar -->
     <img src="@GetAvatarToShow()" alt="Avatar"
          style="width:80px;height:80px;border-radius:50%;">
 
-    <div class="mt-3">
-        <label>Display name</label>
-        <input class="form-control" @bind="_displayName" />
-    </div>
-
-    <div class="mt-3">
-        <label>Avatar URL (optional)</label>
-        <input class="form-control" @bind="_avatarUrl" />
-    </div>
-
-    <!-- ÚJ: Banner URL -->
-    <div class="mt-3">
-        <label>Banner URL (optional)</label>
-        <input class="form-control" @bind="_bannerUrl" />
-        <small class="text-muted">
-            You can paste a banner from pfps.gg, e.g.
-            <code>https://pfps.gg/banners/12345-something</code>
-        </small>
-    </div>
-
-    <button class="btn btn-primary mt-3" @onclick="SaveProfile">Save profile</button>
-
-    @if (!string.IsNullOrEmpty(_statusMessage))
+    @if (IsOwnProfile)
     {
-        <p class="mt-2 text-success">@_statusMessage</p>
+        <!-- Saját profil szerkesztés -->
+        <div class="mt-3">
+            <label>Display name</label>
+            <input class="form-control" @bind="_displayName" />
+        </div>
+
+        <div class="mt-3">
+            <label>Avatar URL (optional)</label>
+            <input class="form-control" @bind="_avatarUrl" />
+        </div>
+
+        <div class="mt-3">
+            <label>Banner URL (optional)</label>
+            <input class="form-control" @bind="_bannerUrl" />
+            <small class="text-muted">
+                You can paste a banner from pfps.gg, e.g.
+                <code>https://pfps.gg/banners/12345-something</code>
+            </small>
+        </div>
+
+        <button class="btn btn-primary mt-3" @onclick="SaveProfile">Save profile</button>
+
+        @if (!string.IsNullOrEmpty(_statusMessage))
+        {
+            <p class="mt-2 text-success">@_statusMessage</p>
+        }
+    }
+    else
+    {
+        <!-- MÁS FELHASZNÁLÓ PROFILJA -->
+        <p class="text-muted mt-3">
+            You are viewing another user's profile.
+        </p>
+
+        @if (Session.CurrentUser is not null)
+        {
+            <button class="btn btn-warning mt-3" @onclick="StartDuel">
+                Challenge to Duel
+            </button>
+        }
+        else
+        {
+            <p class="mt-3">
+                <a href="/login">Log in</a> to challenge this user to a duel.
+            </p>
+        }
     }
 
-    @* … a stat táblázatod maradhat alatta *@
+    @* ide jöhetnek majd a statok, grafikonok, duplák stb. *@
 }
 
 @code {
+    [Parameter] public int? UserId { get; set; }
+
     private User? _user;
     private string _displayName = "";
     private string _avatarUrl   = "";
     private string _bannerUrl   = "";
     private string _statusMessage = "";
 
-    protected override void OnInitialized()
+    private bool IsOwnProfile =>
+        Session.CurrentUser is not null &&
+        _user is not null &&
+        _user.Id == Session.CurrentUser.Id;
+
+    protected override async Task OnInitializedAsync()
     {
-        _user = Session.CurrentUser;
+        // Ha nincs id -> saját profil
+        if (UserId is null)
+        {
+            _user = Session.CurrentUser;
+        }
+        else
+        {
+            // más felhasználó profilja
+            _user = await Db.Users.FindAsync(UserId.Value);
+        }
+
         if (_user is not null)
         {
             _displayName = _user.DisplayName;
@@ -74,9 +119,23 @@ else
         }
     }
 
+    private async Task StartDuel()
+    {
+        if (_user is null || Session.CurrentUser is null)
+            return;
+
+        // current user vs. viewed user
+        int duelId = await DuelService.StartDuel(
+            Session.CurrentUser.Id,
+            _user.Id
+        );
+
+        Nav.NavigateTo($"/duel/{duelId}");
+    }
+
     private async Task SaveProfile()
     {
-        if (_user is null) return;
+        if (_user is null || !IsOwnProfile) return;
 
         _user.DisplayName = _displayName.Trim();
         _user.AvatarUrl   = string.IsNullOrWhiteSpace(_avatarUrl) ? null : _avatarUrl.Trim();

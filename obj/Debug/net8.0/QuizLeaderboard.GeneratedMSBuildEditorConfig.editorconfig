@@ -26,12 +26,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDYXN1YWxRdWl6LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/Components/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/Components/Pages/DailyQuiz.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEYWlseVF1aXoucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/Components/Pages/Duel.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEdWVsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/Components/Pages/Error.razor]
@@ -56,10 +56,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/Components/Pages/Profil.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQcm9maWwucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/Components/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nemoda.mark/Documents/GitHub/QuizLeaderboard/Components/Routes.razor]

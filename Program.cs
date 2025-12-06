@@ -21,11 +21,9 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<UserSession>();
 builder.Services.AddScoped<AuthService>();
 
-// AI kérdésgenerátor HTTP kliens
-builder.Services.AddHttpClient<IQuestionGenerator, OpenAIQuestionGenerator>(client =>
-{
-    client.BaseAddress = new Uri("https://api.groq.com/");
-});
+builder.Services.AddHttpClient<IQuestionGenerator, OpenAIQuestionGenerator>();
+
+builder.Services.AddScoped<DuelService>();
 
 var app = builder.Build();
 
