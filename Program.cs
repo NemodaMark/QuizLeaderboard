@@ -1,33 +1,37 @@
-using QuizLeaderboard.Components;
 using Microsoft.EntityFrameworkCore;
+using QuizLeaderboard.Components;
 using QuizLeaderboard.Data;
-using QuizLeaderboard.Services;
-using QuizLeaderboard.Models;
 using QuizLeaderboard.Hubs;
+using QuizLeaderboard.Models;
+using QuizLeaderboard.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+// Blazor Razor Components – NINCS InteractiveServer, csak sima komponensek
+builder.Services.AddRazorComponents();
 
+// EF Core + SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=leaderboard.db"));
 
-builder.Services.AddScoped<LeaderboardService>();
+// HttpContext eléréséhez (cookie-s auth miatt kell)
+builder.Services.AddHttpContextAccessor();
+
+// SignalR
 builder.Services.AddSignalR();
 
-// Saját „session” és auth logika (NINCS cookie-auth!)
-builder.Services.AddScoped<UserSession>();
+// Saját szolgáltatások
 builder.Services.AddScoped<AuthService>();
-
-builder.Services.AddHttpClient<IQuestionGenerator, OpenAIQuestionGenerator>();
-
+builder.Services.AddScoped<UserSession>();
+builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddScoped<DuelService>();
+
+// OpenAI kérdésgenerátor HTTP klienssel
+builder.Services.AddHttpClient<IQuestionGenerator, OpenAIQuestionGenerator>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Hibakezelés
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -38,27 +42,22 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-// NINCS: app.UseAuthentication();
-// NINCS: app.UseAuthorization();
+// Blazor 8 komponenses hostolás – NINCS rendermode
+app.MapRazorComponents<App>();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
+// SignalR hub a leaderboardhoz
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
 
-// Adatbázis seed
-// Adatbázis seed
+// Demo seed adatok
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    // ⬅️ EZ AZ ÚJ SOR
     db.Database.EnsureCreated();
 
     if (!db.Users.Any())
     {
-        var u1 = new User { DisplayName = "Alice" };
-        var u2 = new User { DisplayName = "Bob" };
+        var u1 = new User { DisplayName = "Alice", Email = "alice@example.com" };
+        var u2 = new User { DisplayName = "Bob", Email = "bob@example.com" };
 
         db.Users.AddRange(u1, u2);
         db.SaveChanges();
@@ -67,14 +66,20 @@ using (var scope = app.Services.CreateScope())
         {
             UserId = u1.Id,
             Score = 50,
-            CompletedAt = DateTime.UtcNow
+            CompletedAt = DateTime.UtcNow,
+            Mode = QuizMode.Casual,
+            Topic = "Seed",
+            Difficulty = "Easy"
         });
 
         db.QuizResults.Add(new QuizResult
         {
             UserId = u2.Id,
             Score = 80,
-            CompletedAt = DateTime.UtcNow
+            CompletedAt = DateTime.UtcNow,
+            Mode = QuizMode.Casual,
+            Topic = "Seed",
+            Difficulty = "Easy"
         });
 
         db.SaveChanges();

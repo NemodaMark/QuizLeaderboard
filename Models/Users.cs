@@ -1,8 +1,22 @@
-﻿public class User
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace QuizLeaderboard.Models;
+
+public class User
 {
-    public int Id { get; set; }
-    public string DisplayName { get; set; } = "";
+    [Key]
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    [EmailAddress]
+    public string? Email { get; set; }
+
+    public string? PasswordHash { get; set; }
+
+    [Required, MaxLength(100)]
+    public string DisplayName { get; set; } = string.Empty;
+
     public string? AvatarUrl { get; set; }
-    
+
     public string? BannerUrl { get; set; }
 }

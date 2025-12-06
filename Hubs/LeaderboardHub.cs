@@ -16,10 +16,11 @@ public class LeaderboardHub : Hub
         _leaderboard = leaderboard;
     }
 
-// új pontszám beküldése demo célra
     public async Task SubmitScore(string userName, int score, LeaderboardPeriod period)
     {
-        // user létrehozása / megkeresése
+        if (string.IsNullOrWhiteSpace(userName) || score <= 0)
+            return;
+
         var user = _db.Users.FirstOrDefault(u => u.DisplayName == userName);
         if (user is null)
         {
@@ -32,15 +33,15 @@ public class LeaderboardHub : Hub
         {
             UserId = user.Id,
             Score = score,
-            CompletedAt = DateTime.UtcNow
+            CompletedAt = DateTime.UtcNow,
+            Mode = QuizMode.Casual,
+            Topic = "Demo",
+            Difficulty = "N/A"
         });
 
         await _db.SaveChangesAsync();
 
-        // frissített toplista lekérése a megadott periódusra
         var leaderboard = await _leaderboard.GetLeaderboardAsync(period);
-
-        // broadcast minden kliensnek
         await Clients.All.SendAsync("LeaderboardUpdated", leaderboard);
     }
-}
+}   

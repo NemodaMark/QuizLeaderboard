@@ -1,12 +1,8 @@
-﻿@page "/duel/{DuelId:int}"
-@rendermode InteractiveServer
-
+﻿@page "/duel/{DuelId:guid}"
 @using Microsoft.AspNetCore.Components
+@using QuizLeaderboard.Models
 @using QuizLeaderboard.Services
 @using QuizLeaderboard.Data
-@using DuelModel = QuizLeaderboard.Models.Duel
-@using DuelQuestionModel = QuizLeaderboard.Models.DuelQuestion
-
 @inject DuelService DuelService
 @inject UserSession Session
 @inject AppDbContext Db
@@ -29,17 +25,15 @@ else if (_isFinished)
 }
 else
 {
-    <h4>Question @_currentIndex / @_duel.QuestionCount</h4>
+    <h4>Question @_currentIndex / @_totalQuestions</h4>
 
     <p>@_currentQ.Text</p>
 
     @for (int i = 0; i < _currentQ.Options.Length; i++)
     {
-        var idx = i;   <!-- fontos: külön lokális változó a closure-höz -->
-
         <button class="btn btn-outline-primary my-2 w-100"
                 disabled="@_answered"
-                @onclick="(() => Answer(idx))">
+                @onclick="(() => Answer(i))">
             @_currentQ.Options[i]
         </button>
     }
@@ -48,7 +42,7 @@ else
     {
         <p class="@_resultClass">@_resultMessage</p>
 
-        @if (_currentIndex < _duel.QuestionCount)
+        @if (_currentIndex < _totalQuestions)
         {
             <button class="btn btn-secondary mt-2" @onclick="Next">Next</button>
         }
@@ -60,12 +54,13 @@ else
 }
 
 @code {
-    [Parameter] public int DuelId { get; set; }
+    [Parameter] public Guid DuelId { get; set; }
 
-    private DuelModel? _duel;
+    private DuelMatch? _duel;
     private bool _isParticipant;
-    private DuelQuestionModel _currentQ = new();
+    private DuelQuestion _currentQ = new();
     private int _currentIndex = 1;
+    private int _totalQuestions;
     private bool _answered;
     private bool _isFinished;
     private int _myScore;
@@ -75,7 +70,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _duel = await DuelService.GetDuel(DuelId);
+        _duel = await DuelService.GetDuelAsync(DuelId);
 
         if (_duel is null)
             return;
@@ -83,20 +78,19 @@ else
         var user = Session.CurrentUser!;
         _isParticipant = (user.Id == _duel.Player1Id) || (user.Id == _duel.Player2Id);
 
-        _currentQ = _duel.Questions
-            .OrderBy(q => q.Index)
-            .FirstOrDefault() ?? new DuelQuestionModel
-            {
-                Text = "No questions found.",
-                Options = new[] { "A", "B", "C", "D" },
-                CorrectIndex = 0
-            };
+        var ordered = _duel.Questions.OrderBy(q => q.Index).ToList();
+        _totalQuestions = ordered.Count;
+
+        _currentQ = ordered.FirstOrDefault() ?? new DuelQuestion
+        {
+            Text = "No questions found.",
+            Options = new[] { "A", "B", "C", "D" },
+            CorrectIndex = 0
+        };
     }
 
     private void Answer(int index)
     {
-        if (_answered) return;
-
         _answered = true;
 
         if (index == _currentQ.CorrectIndex)
@@ -114,13 +108,13 @@ else
 
     private void Next()
     {
-        if (_duel is null) return;
-
         _currentIndex++;
 
-        _currentQ = _duel.Questions
-            .FirstOrDefault(q => q.Index == _currentIndex)
-            ?? _currentQ;  // fallback
+        var next = _duel!.Questions.FirstOrDefault(q => q.Index == _currentIndex);
+        if (next is not null)
+        {
+            _currentQ = next;
+        }
 
         _answered = false;
         _resultMessage = "";
@@ -129,12 +123,10 @@ else
 
     private async Task Finish()
     {
-        if (_duel is null) return;
-
         _isFinished = true;
 
         var user = Session.CurrentUser!;
-        bool isP1 = user.Id == _duel.Player1Id;
+        bool isP1 = user.Id == _duel!.Player1Id;
 
         if (isP1)
             _duel.Player1Score = _myScore;

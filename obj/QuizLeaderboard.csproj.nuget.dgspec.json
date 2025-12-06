@@ -56,6 +56,10 @@
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
               "version": "[8.0.2, )"
+            },
+            "Radzen.Blazor": {
+              "target": "Package",
+              "version": "[8.3.8, )"
             }
           },
           "imports": [

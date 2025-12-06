@@ -1,0 +1,121 @@
+﻿@page "/learning"
+@using QuizLeaderboard.Services
+@inject UserSession Session
+@inject NavigationManager Nav
+
+<h3>Learning mode</h3>
+
+@if (!_loaded)
+{
+    <p>Loading...</p>
+}
+else if (!Session.IsLoggedIn)
+{
+    <div class="alert alert-warning">
+        You must log in to use learning mode.
+    </div>
+    <button class="btn btn-primary" @onclick="GoToLogin">Go to Login</button>
+}
+else
+{
+    <p>
+        Welcome, <strong>@Session.CurrentUser!.DisplayName</strong>!  
+        Choose how you want to practice:
+    </p>
+
+    <div class="row gy-3">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Mixed practice</h5>
+                    <p class="card-text">
+                        Random questions from all topics and difficulties.
+                    </p>
+                    <button class="btn btn-outline-primary" @onclick="StartMixed">
+                        Start practice
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">C# basics</h5>
+                    <p class="card-text">
+                        Focus only on C# basic questions.
+                    </p>
+                    <button class="btn btn-outline-primary" @onclick="StartCSharp">
+                        Start C# practice
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Web fundamentals</h5>
+                    <p class="card-text">
+                        HTML, CSS, HTTP and general web stuff.
+                    </p>
+                    <button class="btn btn-outline-primary" @onclick="StartWeb">
+                        Start Web practice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.EnsureLoadedAsync();
+        _loaded = true;
+    }
+
+    private void GoToLogin()
+    {
+        Nav.NavigateTo("/login");
+    }
+
+    private void StartMixed()
+    {
+        NavigateToQuiz(null, null);
+    }
+
+    private void StartCSharp()
+    {
+        NavigateToQuiz("C# basics", "Easy");
+    }
+
+    private void StartWeb()
+    {
+        NavigateToQuiz("Web fundamentals", "Medium");
+    }
+
+    private void NavigateToQuiz(string? topic, string? difficulty)
+    {
+        var uri = "/learning-quiz";
+
+        var query = new List<string>();
+        if (!string.IsNullOrEmpty(topic))
+        {
+            query.Add($"topic={Uri.EscapeDataString(topic)}");
+        }
+        if (!string.IsNullOrEmpty(difficulty))
+        {
+            query.Add($"difficulty={Uri.EscapeDataString(difficulty)}");
+        }
+
+        if (query.Count > 0)
+        {
+            uri += "?" + string.Join("&", query);
+        }
+
+        Nav.NavigateTo(uri);
+    }
+}

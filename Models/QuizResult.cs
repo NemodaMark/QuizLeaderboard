@@ -1,18 +1,22 @@
-﻿using QuizLeaderboard.Services; // szükséges az enum miatt (ha külön fájlban van)
+﻿using System;
 
-namespace QuizLeaderboard.Models;
-
-public class QuizResult
+namespace QuizLeaderboard.Models
 {
-    public int Id { get; set; }
 
-    public int UserId { get; set; }
-    public User? User { get; set; }
+    public class QuizResult
+    {
+        public int Id { get; set; }
 
-    public int Score { get; set; }
-    public DateTime CompletedAt { get; set; }
+        // User GUID
+        public Guid UserId { get; set; }
+        public User User { get; set; } = null!;
 
-    public QuizMode Mode { get; set; }               // Learning / Daily / Casual / Duel
-    public string Topic { get; set; } = "";          // pl. "C# basics"
-    public string Difficulty { get; set; } = "Medium"; // Easy / Medium / Hard
+        public int Score { get; set; }
+        public DateTime CompletedAt { get; set; }
+
+        public QuizMode Mode { get; set; }
+
+        public string? Topic { get; set; }
+        public string? Difficulty { get; set; }
+    }
 }

@@ -1,0 +1,52 @@
+﻿@page "/dashboard"
+@using QuizLeaderboard.Services
+@using QuizLeaderboard.Models
+@inject UserSession Session
+@inject NavigationManager Nav
+
+<h3>Dashboard</h3>
+
+@if (!_loaded)
+{
+    <p>Loading...</p>
+}
+else if (!Session.IsLoggedIn)
+{
+    <div class="alert alert-warning">
+        You must log in to access the dashboard.
+    </div>
+
+    <button class="btn btn-primary" @onclick="GoToLogin">Go to Login</button>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Hello, @Session.CurrentUser!.DisplayName!</h4>
+            <p class="card-text">
+                Welcome to your dashboard. From here you can:
+            </p>
+            <ul>
+                <li><a href="/casual">Play casual quiz</a></li>
+                <li><a href="/daily">Play daily quiz</a></li>
+                <li><a href="/leaderboard">View leaderboard</a></li>
+                <li><a href="/profile/@Session.CurrentUser.Id">Your profile</a></li>
+            </ul>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.EnsureLoadedAsync();
+        _loaded = true;
+    }
+
+    private void GoToLogin()
+    {
+        Nav.NavigateTo("/login");
+    }
+}

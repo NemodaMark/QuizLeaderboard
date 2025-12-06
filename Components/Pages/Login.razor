@@ -1,49 +1,45 @@
 ﻿@page "/login"
-@rendermode InteractiveServer
-@using QuizLeaderboard.Models
-@using QuizLeaderboard.Services
+@using System.ComponentModel.DataAnnotations
 @inject AuthService Auth
-@inject UserSession Session
+@inject NavigationManager Nav
 
 <h3>Login</h3>
 
-@if (_currentUser is null)
-{
-    <p>Enter a name to log in.</p>
-    <input class="form-control" @bind="_name" placeholder="Your name" />
-    <button class="btn btn-primary mt-2" @onclick="HandleLogin">Log in</button>
-}
-else
-{
-    <p>You are logged in as <strong>@_currentUser.DisplayName</strong>.</p>
-    <button class="btn btn-secondary" @onclick="HandleLogout">Log out</button>
-}
+<EditForm Model="@_model" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <InputText class="form-control" @bind-Value="_model.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <InputText class="form-control" type="password" @bind-Value="_model.Password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary me-2">Login</button>
+    <a href="/register" class="btn btn-link">Register</a>
+</EditForm>
 
 @code {
-    private string? _name;
-    private User? _currentUser;
+    private LoginModel _model = new();
 
-    protected override async Task OnInitializedAsync()
+    private async Task OnValidSubmit()
     {
-        _currentUser = await Auth.GetCurrentUserAsync();
+        await Auth.LoginAsync(_model.Email, _model.Password);
 
-        if (_currentUser is not null)
-        {
-            Session.SetUser(_currentUser);
-        }
+        // Sikeres login után Dashboard
+        Nav.NavigateTo("/dashboard");
     }
 
-    private async Task HandleLogin()
+    public class LoginModel
     {
-        var user = await Auth.LoginOrRegisterAsync(_name ?? "");
-        _currentUser = user;
-        Session.SetUser(user);
-    }
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
 
-    private async Task HandleLogout()
-    {
-        await Auth.LogoutAsync();
-        _currentUser = null;
-        Session.SetUser(null);
+        [Required]
+        public string Password { get; set; } = string.Empty;
     }
 }

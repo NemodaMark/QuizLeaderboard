@@ -1,11 +1,15 @@
 ﻿@page "/register"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using QuizLeaderboard.Services
 @inject AuthService Auth
 @inject NavigationManager Nav
 
 <h3>Register</h3>
 
-<EditForm Model="@_model" OnValidSubmit="@OnValidSubmit">
+<EditForm Model="@_model"
+          OnValidSubmit="@OnSubmit"
+          FormName="registerForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -34,16 +38,19 @@
 </EditForm>
 
 @code {
-    private RegisterModel _model = new();
+    private RegisterModel _model { get; set; } = new();
 
-    private async Task OnValidSubmit()
+    private async Task OnSubmit()
     {
-        // Ha bármelyik mező üres vagy a jelszavak nem egyeznek,
-        // az EditForm nem hívja meg ezt a metódust, csak hibákat mutat.
+        if (_model.Password != _model.ConfirmPassword)
+        {
+            // minimál ellenőrzés – itt lehetne ValidationMessage-t is használni
+            return;
+        }
+
         await Auth.RegisterAsync(_model.Email, _model.Password, _model.DisplayName);
 
-        // Sikeres regisztráció + bejelentkezés után menjünk a Dashboardra
-        Nav.NavigateTo("/dashboard");
+        Nav.NavigateTo("/dashboard", forceLoad: true);
     }
 
     public class RegisterModel
@@ -58,7 +65,6 @@
         public string Password { get; set; } = string.Empty;
 
         [Required]
-        [Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

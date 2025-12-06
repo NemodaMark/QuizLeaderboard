@@ -15,69 +15,51 @@ public class DuelService
         _questionGenerator = questionGenerator;
     }
 
-    public async Task<Duel?> GetDuel(int id)
+    public async Task<Guid> StartDuel(Guid player1Id, Guid player2Id)
     {
-        return await _db.Duels
-            .Include(d => d.Questions)
-            .FirstOrDefaultAsync(d => d.Id == id);
-    }
+        const int questionCount = 4;
 
-    public async Task<Duel> CreateDuelAsync(
-        int player1Id,
-        int player2Id,
-        string topic,
-        string difficulty,
-        int questionCount = 5)
-    {
-        var req = new QuestionRequest(
-            Topic: topic,
-            Difficulty: difficulty,
+        var request = new QuestionRequest(
+            Topic: "C# basics",
+            Difficulty: "Medium",
             Count: questionCount,
             Mode: QuestionSourceMode.Duel
         );
 
-        var questions = await _questionGenerator.GenerateQuestionsAsync(req);
+        var generated = await _questionGenerator.GenerateQuestionsAsync(request);
 
-        var duel = new Duel
+        var duel = new DuelMatch
         {
             Player1Id = player1Id,
             Player2Id = player2Id,
-            QuestionCount = questionCount,
-            Topic = topic,
-            Difficulty = difficulty,
             CreatedAt = DateTime.UtcNow
         };
 
-        var index = 1;
-        foreach (var q in questions)
+        int index = 1;
+        foreach (var q in generated)
         {
-            duel.Questions.Add(new DuelQuestion
+            var dq = new DuelQuestion
             {
                 Index = index++,
                 Text = q.Text,
                 Options = q.Options,
-                CorrectIndex = q.CorrectIndex
-            });
+                CorrectIndex = q.CorrectIndex,
+                Topic = q.Topic,
+                Difficulty = q.Difficulty
+            };
+            duel.Questions.Add(dq);
         }
 
         _db.Duels.Add(duel);
         await _db.SaveChangesAsync();
 
-        return duel;
-    }
-    
-    public async Task<int> StartDuel(int challengerId, int opponentId)
-    {
-        // ideiglenesen fix topic + difficulty, később profilból is jöhet
-        var duel = await CreateDuelAsync(
-            player1Id: challengerId,
-            player2Id: opponentId,
-            topic: "C# basics",
-            difficulty: "Medium",
-            questionCount: 5
-        );
-
         return duel.Id;
     }
 
+    public async Task<DuelMatch?> GetDuelAsync(Guid duelId)
+    {
+        return await _db.Duels
+            .Include(d => d.Questions)
+            .FirstOrDefaultAsync(d => d.Id == duelId);
+    }
 }

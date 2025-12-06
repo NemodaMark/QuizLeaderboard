@@ -1,5 +1,4 @@
 ﻿@page "/daily"
-@rendermode InteractiveServer
 @using QuizLeaderboard.Models
 @using QuizLeaderboard.Services
 @using QuizLeaderboard.Data
@@ -60,11 +59,11 @@ else
 
     private int _currentIndex = 1;
     private Question? _currentQuestion;
-    private bool _answered = false;
+    private bool _answered;
     private string _resultMessage = "";
     private string _resultClass = "";
-    private int _totalScore = 0;
-    private bool _isCompletedToday = false;
+    private int _totalScore;
+    private bool _isCompletedToday;
 
     protected override async Task OnInitializedAsync()
     {
