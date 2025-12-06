@@ -10,52 +10,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="26a52e0a-1cfd-4f2e-9db3-302cc614b79c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.QuizLeaderboard/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.QuizLeaderboard/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.QuizLeaderboard/.idea/projectSettingsUpdater.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.QuizLeaderboard/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.QuizLeaderboard/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/App.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Layout/MainLayout.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Layout/MainLayout.razor.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Layout/NavMenu.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Layout/NavMenu.razor.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/CasualQuiz.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/Counter.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/DailyQuiz.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/Error.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/Home.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/Leaderboard.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/Login.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/Login.razor.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Pages/Weather.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/Routes.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components/_Imports.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data/AppDbContext.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Hubs/LeaderboardHub.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Migrations/20251202213352_InitialCreate.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Migrations/20251202213352_InitialCreate.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Migrations/20251203115018_ExtendQuizResult.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Migrations/20251203115018_ExtendQuizResult.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Migrations/AppDbContextModelSnapshot.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/LeaderboardEntry.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Question.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/QuizMode.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/QuizResult.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Models/Users.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Properties/launchSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuizLeaderboard.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuizLeaderboard.sln" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/AuthService.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/DummyQuestionGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/IQestionGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/LeaderboardService.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/OpenAIQuestionGenerator.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Services/UserSession.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/appsettings.Development.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/appsettings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Components/Pages/Login.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Components/Pages/Login.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Components/Pages/Profile.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Components/Pages/Profile.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Components/Pages/Register.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Components/Pages/Register.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Components/_Imports.razor" beforeDir="false" afterPath="$PROJECT_DIR$/Components/_Imports.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/AuthService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/AuthService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/UserSession.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/UserSession.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/Humanizer.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/Microsoft.AspNetCore.Connections.Abstractions.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/Microsoft.AspNetCore.Http.Connections.Client.dll" beforeDir="false" />
@@ -87,6 +48,7 @@
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/QuizLeaderboard.pdb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/QuizLeaderboard.runtimeconfig.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/QuizLeaderboard.staticwebassets.runtime.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/Radzen.Blazor.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/SQLitePCLRaw.batteries_v2.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/SQLitePCLRaw.core.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/SQLitePCLRaw.provider.e_sqlite3.dll" beforeDir="false" />
@@ -170,25 +132,17 @@
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.resources.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/Debug/net8.0/zh-Hant/Microsoft.CodeAnalysis.resources.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/leaderboard.db" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/leaderboard.db-shm" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/leaderboard.db-wal" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLead.0C2C164A.Up2Date" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.AssemblyInfoInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.GlobalUsings.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.MvcApplicationPartsAssemblyInfo.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.csproj.AssemblyReference.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.csproj.CoreCompileInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.csproj.FileListAbsolute.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.genruntimeconfig.cache" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.sourcelink.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/apphost.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/QuizLeaderboard.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/ref/QuizLeaderboard.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/refint/QuizLeaderboard.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/scopedcss/Components/Layout/MainLayout.razor.rz.scp.css" beforeDir="false" />
@@ -202,19 +156,8 @@
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/staticwebassets/msbuild.build.QuizLeaderboard.props" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.QuizLeaderboard.props" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.QuizLeaderboard.props" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/QuizLeaderboard.csproj.EntityFrameworkCore.targets" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/QuizLeaderboard.csproj.nuget.dgspec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/QuizLeaderboard.csproj.nuget.g.props" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/QuizLeaderboard.csproj.nuget.g.targets" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/project.assets.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/project.nuget.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/project.packagespec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/rider.project.model.nuget.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/rider.project.restore.info" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wwwroot/app.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wwwroot/bootstrap/bootstrap.min.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wwwroot/bootstrap/bootstrap.min.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wwwroot/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,27 +173,33 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c77bfeb68d68d4c8be2720ba99673dda9455b3f1d52f7a34c67499d484aef66/EndpointRoutingMiddleware.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Components/Pages/DailyQuiz.razor" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Components/Pages/Leaderboard.razor" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Components/Pages/Login.razor" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Components/Pages/Login.razor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Components/Pages/Profile.razor" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Data/AppDbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Hubs/LeaderboardHub.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Models/LeaderboardEntry.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Models/DuelMatch.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Models/DuelQuestion.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Models/Lession.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Models/Question.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Models/QuizMode.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Models/QuizResult.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Models/Users.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Services/AuthService.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Services/DuelService.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Services/DummyQuestionGenerator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Services/IQestionGenerator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Services/LeaderboardService.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Services/OpenAIQuestionGenerator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Services/UserSession.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -264,6 +213,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    ".NET Launch Settings Profile.QuizLeaderboard: IIS Express.executor": "Debug",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -276,7 +226,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.sourceCode.C#",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -339,12 +289,14 @@
       <updated>1764708681183</updated>
       <workItem from="1764708683344" duration="2201000" />
       <workItem from="1764711376658" duration="42762000" />
+      <workItem from="1764858268446" duration="59229000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

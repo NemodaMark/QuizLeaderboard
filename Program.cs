@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using QuizLeaderboard.Components;
-using QuizLeaderboard.Data;
-using QuizLeaderboard.Hubs;
+using QuizLeaderboard.Data; // Assuming this contains AppDbContext
+using QuizLeaderboard.Hubs; // Assuming this contains LeaderboardHub
 using QuizLeaderboard.Models;
 using QuizLeaderboard.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ==========================================================
+// ✅ ALL SERVICE REGISTRATIONS MUST OCCUR HERE
+// ==========================================================
 
 // Blazor components – interactive server
 builder.Services.AddRazorComponents()
@@ -22,16 +26,30 @@ builder.Services.AddSignalR();
 // HttpContext access for AuthService
 builder.Services.AddHttpContextAccessor();
 
+// ÚJ: HttpClient és Controllers
+builder.Services.AddHttpClient();
+builder.Services.AddControllers();
+
 // Custom services
 builder.Services.AddScoped<UserSession>();
-builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddScoped<DuelService>();
 
-// Question generator (keep your current implementation)
+// NEW CLIENT-SIDE SERVICE: Must be added for Blazor pages to inject
+builder.Services.AddScoped<AuthService>(); 
+
+// Question generator
 builder.Services.AddHttpClient<IQuestionGenerator, OpenAIQuestionGenerator>();
 
+// ==========================================================
+// ❌ END OF SERVICE REGISTRATIONS
+// ==========================================================
+
 var app = builder.Build();
+
+// ==========================================================
+// ✅ MIDDLEWARE AND ENDPOINT MAPPINGS
+// ==========================================================
 
 // Error handling
 if (!app.Environment.IsDevelopment())
@@ -44,11 +62,14 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-// Single Blazor host – NO MapGet/MapPost("/login"), NO MapPost("/register")
+// Blazor host
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// SignalR hub for leaderboard
+// ÚJ: API Controllers
+app.MapControllers();
+
+// SignalR hub
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
 
 // Seed demo data
@@ -56,35 +77,38 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
-
+    
+    // Seed data (ensure QuizResult and QuizMode types are available)
     if (!db.Users.Any())
     {
         var u1 = new User { DisplayName = "Alice" };
         var u2 = new User { DisplayName = "Bob" };
-
+        
         db.Users.AddRange(u1, u2);
         db.SaveChanges();
-
+        
+        // Assuming QuizResult and QuizMode are correctly defined in your Models
+        // Note: You may want to hash the password for these seed users in a real app.
         db.QuizResults.Add(new QuizResult
         {
             UserId = u1.Id,
             Score = 50,
             CompletedAt = DateTime.UtcNow,
-            Mode = QuizMode.Casual,
+            Mode = (QuizMode)0, // Replace with actual QuizMode enum value
             Topic = "Seed",
             Difficulty = "Easy"
         });
-
+        
         db.QuizResults.Add(new QuizResult
         {
             UserId = u2.Id,
             Score = 80,
             CompletedAt = DateTime.UtcNow,
-            Mode = QuizMode.Casual,
+            Mode = (QuizMode)0, // Replace with actual QuizMode enum value
             Topic = "Seed",
             Difficulty = "Easy"
         });
-
+        
         db.SaveChanges();
     }
 }

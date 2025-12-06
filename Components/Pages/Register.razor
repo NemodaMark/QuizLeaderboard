@@ -1,61 +1,77 @@
 ﻿@page "/register"
+@rendermode InteractiveServer
+
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
 @inject AuthService Auth
 @inject NavigationManager Nav
 
 <h3>Register</h3>
 
-@if (!string.IsNullOrEmpty(_error))
+@if (_passwordMismatch)
 {
-    <div class="alert alert-danger">@_error</div>
+    <div class="alert alert-danger">
+        The passwords don't match.
+    </div>
 }
 
-<EditForm Model="_model" OnValidSubmit="OnSubmit">
+<EditForm Model="_model"
+          OnValidSubmit="HandleValidSubmit"
+          FormName="RegisterForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
         <label class="form-label">Email</label>
-        <InputText class="form-control" @bind-Value="_model.Email" />
+        <InputText class="form-control"
+                   @bind-Value="_model.Email" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Display name</label>
-        <InputText class="form-control" @bind-Value="_model.DisplayName" />
+        <InputText class="form-control"
+                   @bind-Value="_model.DisplayName" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Password</label>
-        <InputText class="form-control" type="password" @bind-Value="_model.Password" />
+        <InputText class="form-control"
+                   type="password"
+                   @bind-Value="_model.Password" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Confirm password</label>
-        <InputText class="form-control" type="password" @bind-Value="_model.ConfirmPassword" />
+        <InputText class="form-control"
+                   type="password"
+                   @bind-Value="_model.ConfirmPassword" />
     </div>
 
     <button type="submit" class="btn btn-primary me-2">Register</button>
-    <a href="/login" class="btn btn-link">Back to login</a>
+    <NavLink href="/login" class="btn btn-link">Back to login</NavLink>
 </EditForm>
 
 @code {
-    private RegisterModel _model = new();
-    private string? _error;
+    private readonly RegisterModel _model = new();
+    private bool _passwordMismatch;
+    private string? _error; // Added error handling display for API response
 
-    private async Task OnSubmit()
+    private async Task HandleValidSubmit()
     {
         _error = null;
-
         if (_model.Password != _model.ConfirmPassword)
         {
-            _error = "Passwords do not match.";
+            _passwordMismatch = true;
             return;
         }
+
+        _passwordMismatch = false;
 
         try
         {
             await Auth.RegisterAsync(_model.Email, _model.Password, _model.DisplayName);
-            Nav.NavigateTo("/dashboard");
+            // after successful registration go straight to dashboard
+            Nav.NavigateTo("/dashboard", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -63,12 +79,12 @@
         }
     }
 
-    private class RegisterModel
+    private sealed class RegisterModel
     {
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-        [Required]
+        [Required, MaxLength(100)]
         public string DisplayName { get; set; } = string.Empty;
 
         [Required]

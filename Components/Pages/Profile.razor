@@ -1,5 +1,6 @@
 ﻿@page "/profile"
 @using QuizLeaderboard.Models
+@rendermode InteractiveServer
 @inject AuthService Auth
 @inject NavigationManager Nav
 
@@ -35,11 +36,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var userId = await Auth.GetCurrentUserIdAsync();
-        if (!string.IsNullOrEmpty(userId))
-        {
-            
-        }
+        // FIX: Call the service method to fetch the full user object
+        _currentUser = await Auth.GetCurrentUserAsync();
+        
         _isLoading = false;
     }
 

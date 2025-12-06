@@ -1,5 +1,8 @@
 ﻿@page "/login"
+@rendermode InteractiveServer
+
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
 @inject AuthService Auth
 @inject NavigationManager Nav
 
@@ -10,36 +13,41 @@
     <div class="alert alert-danger">@_error</div>
 }
 
-<EditForm Model="_model" OnValidSubmit="OnSubmit">
+<EditForm Model="_model"
+          OnValidSubmit="HandleValidSubmit"
+          FormName="LoginForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
         <label class="form-label">Email</label>
-        <InputText class="form-control" @bind-Value="_model.Email" />
+        <InputText class="form-control"
+                   @bind-Value="_model.Email" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Password</label>
-        <InputText class="form-control" type="password" @bind-Value="_model.Password" />
+        <InputText class="form-control"
+                   type="password"
+                   @bind-Value="_model.Password" />
     </div>
 
     <button type="submit" class="btn btn-primary me-2">Login</button>
-    <a href="/register" class="btn btn-link">Register</a>
+    <NavLink href="/register" class="btn btn-link">Register</NavLink>
 </EditForm>
 
 @code {
-    private LoginModel _model = new();
+    private readonly LoginModel _model = new();
     private string? _error;
 
-    private async Task OnSubmit()
+    private async Task HandleValidSubmit()
     {
         _error = null;
-
         try
         {
             await Auth.LoginAsync(_model.Email, _model.Password);
-            Nav.NavigateTo("/dashboard");
+            // go to dashboard when login is OK
+            Nav.NavigateTo("/dashboard", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -47,7 +55,7 @@
         }
     }
 
-    private class LoginModel
+    private sealed class LoginModel
     {
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
