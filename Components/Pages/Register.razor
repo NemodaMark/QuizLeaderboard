@@ -1,15 +1,16 @@
 ﻿@page "/register"
 @using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Components.Forms
-@using QuizLeaderboard.Services
 @inject AuthService Auth
 @inject NavigationManager Nav
 
 <h3>Register</h3>
 
-<EditForm Model="@_model"
-          OnValidSubmit="@OnSubmit"
-          FormName="registerForm">
+@if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger">@_error</div>
+}
+
+<EditForm Model="_model" OnValidSubmit="OnSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -38,22 +39,31 @@
 </EditForm>
 
 @code {
-    private RegisterModel _model { get; set; } = new();
+    private RegisterModel _model = new();
+    private string? _error;
 
     private async Task OnSubmit()
     {
+        _error = null;
+
         if (_model.Password != _model.ConfirmPassword)
         {
-            // minimál ellenőrzés – itt lehetne ValidationMessage-t is használni
+            _error = "Passwords do not match.";
             return;
         }
 
-        await Auth.RegisterAsync(_model.Email, _model.Password, _model.DisplayName);
-
-        Nav.NavigateTo("/dashboard", forceLoad: true);
+        try
+        {
+            await Auth.RegisterAsync(_model.Email, _model.Password, _model.DisplayName);
+            Nav.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
     }
 
-    public class RegisterModel
+    private class RegisterModel
     {
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;

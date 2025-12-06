@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using QuizLeaderboard.Components;
 using QuizLeaderboard.Data;
@@ -7,31 +8,32 @@ using QuizLeaderboard.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Blazor Razor Components – NINCS InteractiveServer, csak sima komponensek
-builder.Services.AddRazorComponents();
+// Blazor components – interactive server
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
 // EF Core + SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=leaderboard.db"));
 
-// HttpContext eléréséhez (cookie-s auth miatt kell)
-builder.Services.AddHttpContextAccessor();
-
 // SignalR
 builder.Services.AddSignalR();
 
-// Saját szolgáltatások
-builder.Services.AddScoped<AuthService>();
+// HttpContext access for AuthService
+builder.Services.AddHttpContextAccessor();
+
+// Custom services
 builder.Services.AddScoped<UserSession>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<LeaderboardService>();
 builder.Services.AddScoped<DuelService>();
 
-// OpenAI kérdésgenerátor HTTP klienssel
+// Question generator (keep your current implementation)
 builder.Services.AddHttpClient<IQuestionGenerator, OpenAIQuestionGenerator>();
 
 var app = builder.Build();
 
-// Hibakezelés
+// Error handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -42,13 +44,14 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-// Blazor 8 komponenses hostolás – NINCS rendermode
-app.MapRazorComponents<App>();
+// Single Blazor host – NO MapGet/MapPost("/login"), NO MapPost("/register")
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
-// SignalR hub a leaderboardhoz
+// SignalR hub for leaderboard
 app.MapHub<LeaderboardHub>("/hubs/leaderboard");
 
-// Demo seed adatok
+// Seed demo data
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -56,8 +59,8 @@ using (var scope = app.Services.CreateScope())
 
     if (!db.Users.Any())
     {
-        var u1 = new User { DisplayName = "Alice", Email = "alice@example.com" };
-        var u2 = new User { DisplayName = "Bob", Email = "bob@example.com" };
+        var u1 = new User { DisplayName = "Alice" };
+        var u2 = new User { DisplayName = "Bob" };
 
         db.Users.AddRange(u1, u2);
         db.SaveChanges();

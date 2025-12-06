@@ -1,0 +1,51 @@
+﻿@page "/profile"
+@using QuizLeaderboard.Models
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+<h3>Profil</h3>
+
+@if (_isLoading)
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Betöltés...</span>
+    </div>
+}
+else if (_currentUser != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@_currentUser.DisplayName</h5>
+            <p class="card-text">Email: @_currentUser.Email</p>
+            <button class="btn btn-danger" @onclick="Logout">Kijelentkezés</button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        <p>Nincs bejelentkezve.</p>
+        <a href="/login" class="btn btn-primary">Bejelentkezés</a>
+    </div>
+}
+
+@code {
+    private User? _currentUser;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await Auth.GetCurrentUserIdAsync();
+        if (!string.IsNullOrEmpty(userId))
+        {
+            
+        }
+        _isLoading = false;
+    }
+
+    private async Task Logout()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("/login", forceLoad: true);
+    }
+}

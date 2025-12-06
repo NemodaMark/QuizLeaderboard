@@ -5,7 +5,12 @@
 
 <h3>Login</h3>
 
-<EditForm Model="@_model" OnValidSubmit="@OnValidSubmit">
+@if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger">@_error</div>
+}
+
+<EditForm Model="_model" OnValidSubmit="OnSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -25,16 +30,24 @@
 
 @code {
     private LoginModel _model = new();
+    private string? _error;
 
-    private async Task OnValidSubmit()
+    private async Task OnSubmit()
     {
-        await Auth.LoginAsync(_model.Email, _model.Password);
+        _error = null;
 
-        // Sikeres login után Dashboard
-        Nav.NavigateTo("/dashboard");
+        try
+        {
+            await Auth.LoginAsync(_model.Email, _model.Password);
+            Nav.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
     }
 
-    public class LoginModel
+    private class LoginModel
     {
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;

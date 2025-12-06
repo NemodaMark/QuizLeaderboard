@@ -1,102 +1,114 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using QuizLeaderboard.Data;
-using QuizLeaderboard.Models;
+﻿using System.Net.Http.Json;
+using Microsoft.JSInterop;
+using System.Net.Http.Headers;
 
 namespace QuizLeaderboard.Services
 {
     public class AuthService
     {
-        private readonly AppDbContext _db;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly HttpClient _http;
+        private readonly IJSRuntime _js;
 
-        public AuthService(AppDbContext db, IHttpContextAccessor httpContextAccessor)
+        public AuthService(HttpClient http, IJSRuntime js)
         {
-            _db = db;
-            _httpContextAccessor = httpContextAccessor;
+            _http = http;
+            _js = js;
         }
 
-        // ---- Egyszerű (nem-BCrypt) jelszó hash ----
-
-        private static string HashPassword(string password)
+        public async Task<(bool success, string? errorMessage)> RegisterAsync(string email, string password, string displayName)
         {
-            using var sha = SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
-        }
-
-        private static bool VerifyPassword(string password, string hash)
-        {
-            if (string.IsNullOrEmpty(hash))
-                return false;
-
-            var computed = HashPassword(password);
-            return string.Equals(computed, hash, StringComparison.Ordinal);
-        }
-
-        // ---- Publikus API ----
-
-        public async Task RegisterAsync(string email, string password, string displayName)
-        {
-            var existing = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (existing != null)
+            try
             {
-                throw new InvalidOperationException("This email address is already in use.");
-            }
-
-            var user = new User
-            {
-                Email = email,
-                DisplayName = displayName,
-                PasswordHash = HashPassword(password)
-            };
-
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-
-            await SignInAsync(user);
-        }
-
-        public async Task LoginAsync(string email, string password)
-        {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
-
-            if (user == null || !VerifyPassword(password, user.PasswordHash ?? string.Empty))
-            {
-                throw new InvalidOperationException("Invalid email or password.");
-            }
-
-            await SignInAsync(user);
-        }
-
-        private Task SignInAsync(User user)
-        {
-            var http = _httpContextAccessor.HttpContext
-                       ?? throw new InvalidOperationException("No HTTP context available.");
-
-            // Egyszerű auth cookie – nem Identity, csak user Id
-            http.Response.Cookies.Append(
-                "QuizAuth",
-                user.Id.ToString(),
-                new CookieOptions
+                var request = new
                 {
-                    HttpOnly = true,
-                    IsEssential = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                });
+                    Email = email,
+                    Password = password,
+                    DisplayName = displayName
+                };
 
-            return Task.CompletedTask;
+                var response = await _http.PostAsJsonAsync("/api/auth/register", request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
+                    if (result?.UserId != null)
+                    {
+                        // UserId mentése localStorage-ba
+                        await _js.InvokeVoidAsync("localStorage.setItem", "userId", result.UserId);
+                    }
+                    return (true, null);
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return (false, "Registration failed. Email may already be in use.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Register error: {ex}");
+                return (false, "An error occurred during registration.");
+            }
         }
 
-        public Task LogoutAsync()
+        public async Task<(bool success, string? errorMessage)> LoginAsync(string email, string password)
         {
-            var http = _httpContextAccessor.HttpContext;
-            http?.Response.Cookies.Delete("QuizAuth");
-            return Task.CompletedTask;
+            try
+            {
+                var request = new
+                {
+                    Email = email,
+                    Password = password
+                };
+
+                var response = await _http.PostAsJsonAsync("/api/auth/login", request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<AuthResponse>();
+                    if (result?.UserId != null)
+                    {
+                        // UserId mentése localStorage-ba
+                        await _js.InvokeVoidAsync("localStorage.setItem", "userId", result.UserId);
+                    }
+                    return (true, null);
+                }
+
+                return (false, "Invalid email or password.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Login error: {ex}");
+                return (false, "An error occurred during login.");
+            }
+        }
+
+        public async Task<bool> LogoutAsync()
+        {
+            try
+            {
+                await _js.InvokeVoidAsync("localStorage.removeItem", "userId");
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<string?> GetCurrentUserIdAsync()
+        {
+            try
+            {
+                return await _js.InvokeAsync<string?>("localStorage.getItem", "userId");
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private class AuthResponse
+        {
+            public string? UserId { get; set; }
         }
     }
 }
