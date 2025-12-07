@@ -1,111 +1,92 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using QuizLeaderboard.Data;
+﻿using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using QuizLeaderboard.Models;
-using System.Security.Cryptography;
-using System.Text;
 
-namespace QuizLeaderboard.Controllers // IMPORTANT: Use Controllers namespace
+namespace QuizLeaderboard.Services
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthService
     {
-        private readonly AppDbContext _db;
+        private readonly HttpClient _http;
+        private readonly UserSession _session;
 
-        public AuthController(AppDbContext db)
+        public AuthService(HttpClient http, UserSession session)
         {
-            _db = db;
+            _http = http;
+            _session = session;
         }
 
-        private static string HashPassword(string password)
+        // ==============================
+        // REGISTER
+        // ==============================
+        public async Task<bool> RegisterAsync(string email, string password, string displayName)
         {
-            using var sha = SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
-        }
+            var response = await _http.PostAsJsonAsync("api/Auth/register", new
+            {
+                Email = email,
+                Password = password,
+                DisplayName = displayName
+            });
 
-        private static bool VerifyPassword(string password, string hash)
-        {
-            if (string.IsNullOrEmpty(hash))
+            if (!response.IsSuccessStatusCode)
                 return false;
-            var computed = HashPassword(password);
-            return string.Equals(computed, hash, StringComparison.Ordinal);
+
+            var result = await response.Content.ReadFromJsonAsync<AuthResult>();
+            if (result?.UserId is { } id)
+            {
+                await _session.SetAuthCookie(id);
+                return true;
+            }
+
+            return false;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        // ==============================
+        // LOGIN
+        // ==============================
+        public async Task<bool> LoginAsync(string email, string password)
         {
-            try
+            var response = await _http.PostAsJsonAsync("api/Auth/login", new
             {
-                if (string.IsNullOrEmpty(request.Email) || 
-                    string.IsNullOrEmpty(request.Password) || 
-                    string.IsNullOrEmpty(request.DisplayName))
-                {
-                    return BadRequest(new { message = "All fields are required." });
-                }
+                Email = email,
+                Password = password
+            });
 
-                var existing = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-                if (existing != null)
-                {
-                    return BadRequest(new { message = "This email address is already in use." });
-                }
+            if (!response.IsSuccessStatusCode)
+                return false;
 
-                var user = new User
-                {
-                    Email = request.Email,
-                    DisplayName = request.DisplayName,
-                    PasswordHash = HashPassword(request.Password)
-                };
-
-                _db.Users.Add(user);
-                await _db.SaveChangesAsync();
-
-                return Ok(new { userId = user.Id.ToString() });
-            }
-            catch (Exception ex)
+            var result = await response.Content.ReadFromJsonAsync<AuthResult>();
+            if (result?.UserId is { } id)
             {
-                Console.WriteLine($"Register error: {ex}");
-                return StatusCode(500, new { message = "An error occurred during registration." });
+                await _session.SetAuthCookie(id);
+                return true;
             }
+
+            return true;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        // ==============================
+        // LOGOUT
+        // ==============================
+        public Task LogoutAsync()
         {
-            try
-            {
-                if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
-                {
-                    return BadRequest(new { message = "Email and password are required." });
-                }
-
-                var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-                if (user == null || !VerifyPassword(request.Password, user.PasswordHash ?? string.Empty))
-                {
-                    return Unauthorized(new { message = "Invalid email or password." });
-                }
-
-                return Ok(new { userId = user.Id.ToString() });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Login error: {ex}");
-                return StatusCode(500, new { message = "An error occurred during login." });
-            }
+            _session.ClearAuthCookie();
+            return Task.CompletedTask;
         }
-    }
 
-    public class RegisterRequest
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string DisplayName { get; set; } = string.Empty;
-    }
+        // ==============================
+        // CURRENT USER
+        // ==============================
+        public async Task<User?> GetCurrentUserAsync()
+        {
+            await _session.EnsureLoadedAsync();
+            return _session.CurrentUser;
+        }
 
-    public class LoginRequest
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        // belső DTO a /api/Auth válaszhoz
+        private class AuthResult
+        {
+            public string? UserId { get; set; }
+        }
     }
 }

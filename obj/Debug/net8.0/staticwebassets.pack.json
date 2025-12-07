@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\QuizLeaderboard.bundle.scp.css",
+      "PackagePath": "staticwebassets\\QuizLeaderboard.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\nemoda.mark\\Documents\\GitHub\\QuizLeaderboard\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.QuizLeaderboard.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.QuizLeaderboard.props",
+      "PackagePath": "build\\QuizLeaderboard.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.QuizLeaderboard.props",
+      "PackagePath": "buildMultiTargeting\\QuizLeaderboard.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.QuizLeaderboard.props",
+      "PackagePath": "buildTransitive\\QuizLeaderboard.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

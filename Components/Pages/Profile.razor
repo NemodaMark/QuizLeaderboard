@@ -1,6 +1,6 @@
 ﻿@page "/profile"
+
 @using QuizLeaderboard.Models
-@rendermode InteractiveServer
 @inject AuthService Auth
 @inject NavigationManager Nav
 
@@ -12,7 +12,7 @@
         <span class="visually-hidden">Betöltés...</span>
     </div>
 }
-else if (_currentUser != null)
+else if (_currentUser is not null)
 {
     <div class="card">
         <div class="card-body">
@@ -32,13 +32,15 @@ else
 
 @code {
     private User? _currentUser;
-    private bool _isLoading = true;
+    private bool _isLoading;
 
     protected override async Task OnInitializedAsync()
     {
-        // FIX: Call the service method to fetch the full user object
+        _isLoading = true;
+
+        // teljes user objektum betöltése a service-ből
         _currentUser = await Auth.GetCurrentUserAsync();
-        
+
         _isLoading = false;
     }
 

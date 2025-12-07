@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
+
 using QuizLeaderboard.Components;
-using QuizLeaderboard.Data; // Assuming this contains AppDbContext
-using QuizLeaderboard.Hubs; // Assuming this contains LeaderboardHub
+using QuizLeaderboard.Data;
+using QuizLeaderboard.Hubs;
 using QuizLeaderboard.Models;
 using QuizLeaderboard.Services;
 
@@ -11,6 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 // ==========================================================
 // ✅ ALL SERVICE REGISTRATIONS MUST OCCUR HERE
 // ==========================================================
+
+builder.Services.AddScoped<UserSession>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<AuthService>();
+
+// Blazor Servernél kell egy HttpClient is:
+builder.Services.AddScoped(sp =>
+{
+    var nav = sp.GetRequiredService<NavigationManager>();
+    return new HttpClient { BaseAddress = new Uri(nav.BaseUri) };
+});
 
 // Blazor components – interactive server
 builder.Services.AddRazorComponents()
