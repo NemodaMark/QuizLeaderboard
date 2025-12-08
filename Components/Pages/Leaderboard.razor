@@ -1,4 +1,5 @@
 ﻿@page "/leaderboard"
+@rendermode @(new Microsoft.AspNetCore.Components.Web.InteractiveServerRenderMode())
 @using QuizLeaderboard.Services
 @using QuizLeaderboard.Models
 @using Microsoft.AspNetCore.SignalR.Client
@@ -94,7 +95,8 @@
                             <td class="text-end">
                                 <button type="button"
                                         class="btn btn-sm btn-outline-secondary"
-                                        @onclick="(MouseEventArgs _) => GoToProfile(e.UserId)">
+                                        @onclick="() => GoToProfile(e.UserId)"
+                                        @onclick:stopPropagation="true">
                                     Profile
                                 </button>
                             </td>
@@ -138,6 +140,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Session.EnsureLoadedAsync();
+        
         _hubConnection = new HubConnectionBuilder()
             .WithUrl(Navigation.ToAbsoluteUri("/hubs/leaderboard"))
             .WithAutomaticReconnect()

@@ -1,0 +1,40 @@
+@page "/auth/setcookie"
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager Nav
+
+<h3>Logging in...</h3>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? UserId { get; set; }
+    
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrEmpty(UserId))
+        {
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        var httpContext = HttpContextAccessor.HttpContext;
+        if (httpContext != null)
+        {
+            httpContext.Response.Cookies.Append(
+                "QuizAuth",
+                UserId,
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddDays(30),
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                });
+        }
+
+        Nav.NavigateTo(ReturnUrl ?? "/profile", forceLoad: true);
+    }
+}

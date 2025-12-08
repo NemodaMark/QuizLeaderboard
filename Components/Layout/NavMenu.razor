@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject UserSession Session
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">QuizLeaderboard</a>
     </div>
@@ -9,59 +11,84 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
         
-        <!-- Login -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/login">
-                <span class="oi oi-account-login" aria-hidden="true"></span> Login
-            </NavLink>
-        </div>
+        @if (!Session.IsLoggedIn)
+        {
+            <!-- Login - csak kijelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/login">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Login
+                </NavLink>
+            </div>
+            
+            <!-- Register - csak kijelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/register">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Register
+                </NavLink>
+            </div>
+        }
         
-        <!-- Register -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/register">
-                <span class="oi oi-account-login" aria-hidden="true"></span> Register
-            </NavLink>
-        </div>
+        @if (Session.IsLoggedIn)
+        {
+            <!-- Dashboard - csak bejelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/dashboard">
+                    <span class="oi oi-home" aria-hidden="true"></span> Dashboard
+                </NavLink>
+            </div>
+            
+            <!-- Profile - csak bejelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/profile">
+                    <span class="oi oi-person" aria-hidden="true"></span> Profile
+                </NavLink>
+            </div>
+        }
         
-        <!-- Profile -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/profile">
-                <span class="oi oi-person" aria-hidden="true"></span> Profile
-            </NavLink>
-        </div>
-        
-        <!-- Leaderboard -->
+        <!-- Leaderboard - mindig látható -->
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="leaderboard">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Leaderboard
             </NavLink>
         </div>
 
-        <!-- Casual Quiz -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/casual">
-                <span class="oi oi-question-mark" aria-hidden="true"></span> Casual Quiz
-            </NavLink>
-        </div>
+        @if (Session.IsLoggedIn)
+        {
+            <!-- Casual Quiz - csak bejelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/casual">
+                    <span class="oi oi-question-mark" aria-hidden="true"></span> Casual Quiz
+                </NavLink>
+            </div>
 
-        <!-- Daily Quiz -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/daily">
-                <span class="oi oi-question-mark" aria-hidden="true"></span> Daily Quiz
-            </NavLink>
-        </div>
-        
-        <!-- Learning Quiz -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/learning">
-                <span class="oi oi-book" aria-hidden="true"></span> Learning
-            </NavLink>
-        </div>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/dashboard"> Dashboard
-            </NavLink>
-        </li>
-
+            <!-- Daily Quiz - csak bejelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/daily">
+                    <span class="oi oi-question-mark" aria-hidden="true"></span> Daily Quiz
+                </NavLink>
+            </div>
+            
+            <!-- Learning Quiz - csak bejelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/learning">
+                    <span class="oi oi-book" aria-hidden="true"></span> Learning
+                </NavLink>
+            </div>
+            
+            <!-- Logout - csak bejelentkezve -->
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/logout">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+                </NavLink>
+            </div>
+        }
 
     </nav>
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await Session.EnsureLoadedAsync();
+    }
+}

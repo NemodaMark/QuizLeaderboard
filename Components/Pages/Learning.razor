@@ -84,7 +84,8 @@ else
 
     private void StartMixed()
     {
-        NavigateToQuiz(null, null);
+      
+        Nav.NavigateTo("/learning-quiz");
     }
 
     private void StartCSharp()
@@ -97,25 +98,9 @@ else
         NavigateToQuiz("Web fundamentals", "Medium");
     }
 
-    private void NavigateToQuiz(string? topic, string? difficulty)
+    private void NavigateToQuiz(string topic, string difficulty)
     {
-        var uri = "/learning-quiz";
-
-        var query = new List<string>();
-        if (!string.IsNullOrEmpty(topic))
-        {
-            query.Add($"topic={Uri.EscapeDataString(topic)}");
-        }
-        if (!string.IsNullOrEmpty(difficulty))
-        {
-            query.Add($"difficulty={Uri.EscapeDataString(difficulty)}");
-        }
-
-        if (query.Count > 0)
-        {
-            uri += "?" + string.Join("&", query);
-        }
-
-        Nav.NavigateTo(uri);
+        var query = $"?topic={Uri.EscapeDataString(topic)}&difficulty={Uri.EscapeDataString(difficulty)}";
+        Nav.NavigateTo($"/learning-quiz{query}");
     }
 }

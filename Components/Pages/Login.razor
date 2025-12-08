@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
 @inject AuthService Auth
 @inject NavigationManager Nav
 
@@ -10,23 +11,29 @@
     <div class="alert alert-danger">@_error</div>
 }
 
-<EditForm Model="_model"
+@if (!string.IsNullOrEmpty(_successMessage))
+{
+    <div class="alert alert-success">@_successMessage</div>
+}
+
+<EditForm Model="Model"
           OnValidSubmit="HandleValidSubmit"
-          FormName="LoginForm">
+          FormName="LoginForm"
+          Enhance>
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
         <label class="form-label">Email</label>
         <InputText class="form-control"
-                   @bind-Value="_model.Email" />
+                   @bind-Value="Model.Email" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Password</label>
         <InputText class="form-control"
                    type="password"
-                   @bind-Value="_model.Password" />
+                   @bind-Value="Model.Password" />
     </div>
 
     <button type="submit" class="btn btn-primary me-2">Login</button>
@@ -34,21 +41,34 @@
 </EditForm>
 
 @code {
-    private readonly LoginModel _model = new();
+    [SupplyParameterFromForm]
+    private LoginModel Model { get; set; } = new();
+    
     private string? _error;
+    private string? _successMessage;
 
     private async Task HandleValidSubmit()
     {
         _error = null;
+        _successMessage = null;
+        
         try
         {
-            await Auth.LoginAsync(_model.Email, _model.Password);
-            // go to dashboard when login is OK
-            Nav.NavigateTo("/dashboard", forceLoad: true);
+            var result = await Auth.LoginAsync(Model.Email, Model.Password);
+            
+            if (result.Success && result.UserId != null)
+            {
+            
+                Nav.NavigateTo($"/auth/setcookie?userId={result.UserId}&returnUrl=/profile", forceLoad: true);
+            }
+            else
+            {
+                _error = result.ErrorMessage ?? "Invalid email or password.";
+            }
         }
         catch (Exception ex)
         {
-            _error = ex.Message;
+            _error = $"Login error: {ex.Message}";
         }
     }
 

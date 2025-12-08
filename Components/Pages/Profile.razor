@@ -1,52 +1,137 @@
 ﻿@page "/profile"
-
+@page "/profile/{UserId:guid}"
 @using QuizLeaderboard.Models
+@using QuizLeaderboard.Data
+@using Microsoft.EntityFrameworkCore
 @inject AuthService Auth
 @inject NavigationManager Nav
+@inject AppDbContext Db
 
-<h3>Profil</h3>
+<h3>Profile</h3>
 
 @if (_isLoading)
 {
     <div class="spinner-border" role="status">
-        <span class="visually-hidden">Betöltés...</span>
+        <span class="visually-hidden">Loading...</span>
     </div>
 }
-else if (_currentUser is not null)
+else if (_profileUser is not null)
 {
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">@_currentUser.DisplayName</h5>
-            <p class="card-text">Email: @_currentUser.Email</p>
-            <button class="btn btn-danger" @onclick="Logout">Kijelentkezés</button>
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h5 class="card-title">@_profileUser.DisplayName</h5>
+                    <p class="card-text text-muted">Email: @_profileUser.Email</p>
+                
+                </div>
+                
+                @if (_isOwnProfile)
+                {
+                    <span class="badge bg-primary">Your Profile</span>
+                }
+            </div>
+
+            @if (_quizResults.Any())
+            {
+                <hr />
+                <h6>Quiz History</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Topic</th>
+                                <th>Difficulty</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var result in _quizResults.Take(10))
+                            {
+                                <tr>
+                                    <td>@result.CompletedAt.ToString("MMM dd, yyyy")</td>
+                                    <td>@result.Topic</td>
+                                    <td>@result.Difficulty</td>
+                                    <td><strong>@result.Score</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (_quizResults.Count > 10)
+                {
+                    <p class="text-muted"><small>Showing 10 of @_quizResults.Count results</small></p>
+                }
+            }
+            else
+            {
+                <hr />
+                <p class="text-muted">No quiz results yet.</p>
+            }
+
+            <div class="mt-3">
+                @if (_isOwnProfile)
+                {
+                    <a href="/logout" class="btn btn-danger">Logout</a>
+                }
+                <a href="/leaderboard" class="btn btn-secondary">Back to Leaderboard</a>
+            </div>
         </div>
     </div>
 }
 else
 {
     <div class="alert alert-warning">
-        <p>Nincs bejelentkezve.</p>
-        <a href="/login" class="btn btn-primary">Bejelentkezés</a>
+        <p>User not found.</p>
+        <a href="/leaderboard" class="btn btn-primary">Back to Leaderboard</a>
     </div>
 }
 
 @code {
+    [Parameter]
+    public Guid? UserId { get; set; }
+    
+    private User? _profileUser;
     private User? _currentUser;
-    private bool _isLoading;
+    private bool _isLoading = true;
+    private bool _isOwnProfile = false;
+    private List<QuizResult> _quizResults = new();
 
     protected override async Task OnInitializedAsync()
     {
         _isLoading = true;
 
-        // teljes user objektum betöltése a service-ből
         _currentUser = await Auth.GetCurrentUserAsync();
 
-        _isLoading = false;
-    }
+        if (UserId.HasValue)
+        {
+            _profileUser = await Db.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == UserId.Value);
+            
+            _isOwnProfile = _currentUser != null && _currentUser.Id == UserId.Value;
+        }
+        else
+        {
+        
+            if (_currentUser != null)
+            {
+                _profileUser = _currentUser;
+                _isOwnProfile = true;
+            }
+        }
 
-    private async Task Logout()
-    {
-        await Auth.LogoutAsync();
-        Nav.NavigateTo("/login", forceLoad: true);
+        if (_profileUser != null)
+        {
+            _quizResults = await Db.QuizResults
+                .AsNoTracking()
+                .Where(qr => qr.UserId == _profileUser.Id)
+                .OrderByDescending(qr => qr.CompletedAt)
+                .ToListAsync();
+        }
+
+        _isLoading = false;
     }
 }

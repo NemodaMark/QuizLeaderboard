@@ -32,9 +32,10 @@ else
 
     @for (int i = 0; i < _currentQuestion.Options.Length; i++)
     {
+        var index = i; // Lokális változó létrehozása a closure probléma elkerülésére
         <button class="btn btn-outline-primary my-2"
                 disabled="@_answered"
-                @onclick="(() => Answer(i))">
+                @onclick="@(() => Answer(index))">
             @_currentQuestion.Options[i]
         </button>
     }
